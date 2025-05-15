@@ -12,7 +12,7 @@ if (!isset($_SESSION['id_utilizador']) || $_SESSION['perfil'] !== 'Gestor') {
 $nome = $_SESSION['nome'];
 $fotografia = isset($_SESSION['fotografia']) && file_exists($_SESSION['fotografia']) 
     ? $_SESSION['fotografia'] 
-    : 'uploads/perfis/default.png';
+    : 'imagens/homem.png';
 
 // Buscar médicos e estatísticas
 $query_medicos = "SELECT id_utilizador, nome FROM Utilizador WHERE perfil = 'Medico'";
