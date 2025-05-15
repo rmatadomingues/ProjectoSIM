@@ -54,10 +54,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <body>
 <div class="header" style="display: flex; align-items: center;">
     <img src="imagens/logo.png" width="170px" alt="" id="logo">
-    <h4>Plataforma de apoio à decisão médica com análise automatizada de opiniões de pacientes.</h4>
+    <h4 style="margin-left: 150px;">Plataforma de apoio à decisão médica com análise automatizada de opiniões de pacientes</h4>
 </div>
 <hr>
-<div class="sessao" style="text-align: center; background-color: #7b9ec1;margin: auto; width: 80%" >
+<div class="sessao" style="text-align: center; background-color: #bfa4e8;margin: auto; width: 55%" >
+
     <h2>Iniciar Sessão</h2>
 
 
