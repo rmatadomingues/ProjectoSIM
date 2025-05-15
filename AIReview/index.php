@@ -52,23 +52,41 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <title>AIReview - Página Inicial</title>
 </head>
 <body>
-    <h1>🧠 AIReview</h1>
-    <p>Plataforma de apoio à decisão médica com análise automatizada de opiniões de pacientes.</p>
-
+<div class="header" style="display: flex; align-items: center;">
+    <img src="imagens/logo.png" width="170px" alt="" id="logo">
+    <h4>Plataforma de apoio à decisão médica com análise automatizada de opiniões de pacientes.</h4>
+</div>
+<hr>
+<div class="sessao" style="text-align: center; background-color: #7b9ec1;margin: auto; width: 80%" >
     <h2>Iniciar Sessão</h2>
+
 
     <?php if ($erro): ?>
         <p style="color: red;"><?php echo $erro; ?></p>
     <?php endif; ?>
 
     <form method="POST">
-        <label>Username:</label><br>
-        <input type="text" name="username" required><br><br>
-
-        <label>Password:</label><br>
-        <input type="password" name="password" required><br><br>
-
-        <input type="submit" value="Entrar">
+        <table align="center">
+            <tr>
+                <td>
+                    <label>Username:</label>
+                    <input name="username" required><br><br>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <label>Password:</label>
+                    <input type="password" name="password" required><br><br>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <input type="submit" value="Entrar">
+                </td>
+            </tr>
+        </table>
     </form>
+</div>
+<hr>
 </body>
 </html>
