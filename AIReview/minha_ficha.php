@@ -11,7 +11,7 @@ if (!isset($_SESSION['id_utilizador'])) {
 
 $id = $_SESSION['id_utilizador'];
 $mensagem = '';
-$caminho_fotos = "uploads/perfis/";
+$caminho_fotos = "imagens/";
 if (!is_dir($caminho_fotos)) {
     mkdir($caminho_fotos, 0777, true);
 }
@@ -65,9 +65,9 @@ if (!$utilizador) {
 }
 
 // Definir imagem de perfil (real ou genérica)
-$foto_perfil = $utilizador['fotografia'] && file_exists($utilizador['fotografia']) 
-    ? $utilizador['fotografia'] 
-    : 'uploads/perfis/default.png';
+$foto_perfil = $utilizador['fotografia'] && file_exists($utilizador['fotografia'])
+    ? $utilizador['fotografia']
+    : 'imagens/homem.png';
 ?>
 
 <!DOCTYPE html>
@@ -75,36 +75,65 @@ $foto_perfil = $utilizador['fotografia'] && file_exists($utilizador['fotografia'
 <head>
     <meta charset="UTF-8">
     <title>Minha Ficha</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 40px;
+            background-color: #f4f4f4;
+        }
+        .container {
+            max-width: 500px;
+            margin: auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px #ccc;
+        }
+        img {
+            width: 150px;
+            height: auto;
+            border-radius: 10px;
+            display: block;
+            margin: 0 auto 20px;
+        }
+        .info {
+            margin: 10px 0;
+        }
+        .info strong {
+            display: inline-block;
+            width: 100px;
+        }
+        .edit-link {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .edit-link a {
+            text-decoration: none;
+            color: white;
+            background: #7b9ec1;
+            padding: 10px 20px;
+            border-radius: 6px;
+        }
+    </style>
 </head>
 <body>
-    <h2>Minha Ficha</h2>
+<div class="container">
+    <h2 style="text-align:center;">Minha Ficha</h2>
+    <img src="<?php echo $foto_perfil; ?>" alt="Foto de perfil">
 
-    <?php if ($mensagem): ?>
-        <p><strong><?php echo $mensagem; ?></strong></p>
-    <?php endif; ?>
+    <div class="info"><strong>Nome:</strong> <?php echo $utilizador['nome']; ?></div>
+    <div class="info"><strong>Morada:</strong> <?php echo $utilizador['morada']; ?></div>
+    <div class="info"><strong>Contactos:</strong> <?php echo $utilizador['contactos']; ?></div>
+    <div class="info"><strong>Username:</strong> <?php echo $utilizador['username']; ?></div>
 
-    <form method="POST" enctype="multipart/form-data">
-        <img src="<?php echo $foto_perfil; ?>" alt="Foto de perfil" width="150" style="cursor:pointer;" onclick="document.getElementById('foto').click();"><br>
-        <input type="file" name="foto" id="foto" style="display:none;"><br><br>
-
-        <label>Nome:</label><br>
-        <input type="text" name="nome" value="<?php echo $utilizador['nome']; ?>" required><br><br>
-
-        <label>Morada:</label><br>
-        <input type="text" name="morada" value="<?php echo $utilizador['morada']; ?>"><br><br>
-
-        <label>Contactos:</label><br>
-        <input type="text" name="contactos" value="<?php echo $utilizador['contactos']; ?>"><br><br>
-
-        <label>Username:</label><br>
-        <input type="text" name="username" value="<?php echo $utilizador['username']; ?>" required><br><br>
-
-        <label>Nova password (opcional):</label><br>
-        <input type="password" name="nova_password"><br><br>
-
-        <input type="submit" value="Guardar alterações">
-    </form>
-
-    <p><a href="index.php">⬅ Voltar</a></p>
+    <div class="edit-link">
+        <a href="editar_ficha.php">Editar ficha</a>
+        <br>
+        <br>
+        <br>
+        <i class="fa-solid fa-arrow-left"></i>
+        <a href="dashboard_paciente.php">Voltar</a>
+    </div>
+</div>
 </body>
 </html>
