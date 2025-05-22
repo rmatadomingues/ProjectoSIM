@@ -86,7 +86,7 @@ while ($row = mysqli_fetch_assoc($resultado_perfis)) {
     <h3>⚙️ Ações Rápidas</h3>
     <ul>
         <li><a href="gestao_utilizadores.php">👥 Gestão de utilizadores</a></li>
-        <li><a href="minha_ficha.php">👤 Ver/editar a minha ficha</a></li>
+        <li><a href="minha_ficha_pac.php">👤 Ver/editar a minha ficha</a></li>
         <li><a href="logout.php">🚪 Terminar sessão</a></li>
     </ul>
 </body>
