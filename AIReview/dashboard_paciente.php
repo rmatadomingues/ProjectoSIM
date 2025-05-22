@@ -1,4 +1,3 @@
-
 <?php
 session_start();
 require_once('config.php');
@@ -8,107 +7,382 @@ if (!isset($_SESSION['id_utilizador']) || $_SESSION['perfil'] !== 'Paciente') {
     exit;
 }
 
+$host = 'localhost';
+$user = 'root';
+$password = 'root';
+$database = 'ai_review';
+
+$conn = mysqli_connect($host, $user, $password, $database);
+
+if (!$conn) {
+    die("Erro na ligação à base de dados: " . mysqli_connect_error());
+}
+
+$id_paciente = $_SESSION['id_utilizador'];
 $nome = $_SESSION['nome'];
-$fotografia = isset($_SESSION['fotografia']) && file_exists($_SESSION['fotografia']) 
-    ? $_SESSION['fotografia'] 
+$fotografia = isset($_SESSION['fotografia']) && file_exists($_SESSION['fotografia'])
+    ? $_SESSION['fotografia']
     : 'imagens/homem.png';
+
+$sql = "SELECT c.*, u.nome AS nome_medico
+        FROM consulta c
+        JOIN utilizador u ON c.id_medico = u.id_utilizador
+        WHERE c.id_paciente = ?
+        ORDER BY c.data_hora DESC";
+
+$stmt = $conn->prepare($sql);
+$stmt->bind_param("i", $id_paciente);
+$stmt->execute();
+$result = $stmt->get_result();
+$consultas = $result->fetch_all(MYSQLI_ASSOC);
+
+$query_user = "SELECT * FROM Utilizador WHERE id_utilizador = $id_paciente AND perfil = 'Paciente'";
+$result_user = mysqli_query($conn, $query_user);
+$paciente = mysqli_fetch_assoc($result_user);
+
+if (!$paciente) {
+    echo "Paciente não encontrado.";
+    exit;
+}
+
+$query_p = "SELECT * FROM Paciente WHERE id_utilizador = $id_paciente";
+$result_p = mysqli_query($conn, $query_p);
+$dados_extra = mysqli_fetch_assoc($result_p);
 ?>
 
 <!DOCTYPE html>
 <html lang="pt">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard Paciente</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
+        :root {
+            --primary-color: #1e235f;
+            --secondary-color: #1e235f;
+            --accent-color: #ff7e5f;
+            --light-color: #f8f9fa;
+            --dark-color: #343a40;
+            --text-color: #495057;
+            --border-color: #dee2e6;
+            --success-color: #28a745;
+            --warning-color: #ffc107;
+            --danger-color: #dc3545;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --border-radius: 8px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
-            font-family: Arial, sans-serif;
-            margin: 30px;
-            background-color: #f9f9f9;
-            color: #333;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f7fa;
+            color: var(--text-color);
+            line-height: 1.6;
+            padding: 0;
+            margin: 0;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .dashboard {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 30px;
+        }
+
+        .sidebar {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 25px;
+            box-shadow: var(--shadow);
+            height: fit-content;
+        }
+
+        .main-content {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 30px;
+            box-shadow: var(--shadow);
         }
 
         .header {
             display: flex;
             align-items: center;
-            gap: 15px;
-            margin-bottom: 20px;
+            gap: 20px;
+            margin-bottom: 25px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border-color);
         }
 
         .header img {
-            border-radius: 60%;
+            border-radius: 50%;
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border: 3px solid var(--secondary-color);
         }
 
-        h2 {
-            margin: 0;
+        .user-info h2 {
+            font-size: 1.5rem;
+            color: var(--dark-color);
+            margin-bottom: 5px;
         }
 
-        a {
-            text-decoration: none;
-            color: #333333;
+        .user-info p {
+            color: var(--secondary-color);
+            font-size: 0.9rem;
         }
 
-        a:hover {
-            text-decoration: underline;
+        .nav-menu {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
         }
 
-        .link-box {
-            margin: 15px 0;
+        .nav-link {
             display: flex;
             align-items: center;
-            gap: 8px;
-            font-size: 16px;
+            gap: 12px;
+            padding: 12px 15px;
+            border-radius: var(--border-radius);
+            color: var(--text-color);
+            transition: all 0.3s ease;
+            text-decoration: none;
         }
 
-        .link-box i {
-            color: #7b9ec1;
+        .nav-link i {
+            width: 20px;
+            text-align: center;
+            color: var(--secondary-color);
         }
 
-        p {
-            margin: 10px 0;
+        .nav-link:hover {
+            background-color: #f0f4f8;
+            color: var(--primary-color);
+            transform: translateX(5px);
         }
 
-        hr {
+        .nav-link:hover i {
+            color: var(--primary-color);
+        }
+
+        .nav-link.active {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .nav-link.active i {
+            color: white;
+        }
+
+        .logout-link {
+            margin-top: 20px;
+            color: var(--danger-color);
+        }
+
+        .logout-link:hover {
+            color: #c82333;
+        }
+
+        h3 {
+            font-size: 1.3rem;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        h3 i {
+            font-size: 1.1rem;
+        }
+
+        .card {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: var(--shadow);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            font-size: 0.9rem;
+        }
+
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        th {
+            background-color: var(--primary-color);
+            color: white;
+            font-weight: 600;
+        }
+
+        tr:hover {
+            background-color: #f8f9fa;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 8px 15px;
+            border-radius: var(--border-radius);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
             border: none;
-            border-top: 1px solid #ccc;
-            margin: 20px 0;
         }
 
-        em {
-            color: #555;
+        .btn-primary:hover {
+            background-color: #3a5a8f;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .btn-icon {
+            color: var(--primary-color);
+            padding: 5px;
+        }
+
+        .btn-icon:hover {
+            color: var(--secondary-color);
+            text-decoration: none;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #6c757d;
+        }
+
+        .empty-state i {
+            font-size: 2rem;
+            margin-bottom: 15px;
+            color: var(--border-color);
+        }
+
+        .consultation-summary {
+            max-width: 300px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        @media (max-width: 768px) {
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+
+            .sidebar {
+                margin-bottom: 30px;
+            }
+
+            table {
+                display: block;
+                overflow-x: auto;
+            }
         }
     </style>
 </head>
 
 <body>
-<div class="header">
-    <img src="<?php echo $fotografia; ?>" width="75" height="75" alt="Foto do paciente">
-    <h2>Olá, <?php echo htmlspecialchars($nome); ?>!</h2>
+<div class="container">
+    <div class="dashboard">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="header">
+                <img src="<?php echo $fotografia; ?>" alt="Foto do paciente">
+                <div class="user-info">
+                    <h2><?php echo htmlspecialchars($nome); ?></h2>
+                    <p>Paciente</p>
+                </div>
+            </div>
+
+            <nav class="nav-menu">
+
+                <a href="minha_ficha_pac.php" class="nav-link">
+                    <i class="fas fa-file-medical"></i>
+                    <span>Ficha Médica</span>
+                </a>
+
+                <a href="#" class="nav-link">
+                    <i class="fas fa-comment-medical"></i>
+                    <span>Adicionar Opinião</span>
+                </a>
+
+                <a href="logout.php" class="nav-link logout-link">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Terminar Sessão</span>
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <h3><i class="fas fa-clipboard-list"></i> Histórico de Consultas</h3>
+
+            <?php if (count($consultas) === 0): ?>
+                <div class="empty-state">
+                    <i class="fas fa-calendar-times"></i>
+                    <p>Não existem consultas registadas</p>
+                </div>
+            <?php else: ?>
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                        <tr>
+                            <th>Data</th>
+                            <th>Médico</th>
+                            <th>Resumo</th>
+                            <th>Ações</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <?php foreach ($consultas as $c): ?>
+                            <tr>
+                                <td><?php echo date('d/m/Y H:i', strtotime($c['data_hora'])); ?></td>
+                                <td><?php echo htmlspecialchars($c['nome_medico']); ?></td>
+                                <td class="consultation-summary" title="<?php echo htmlspecialchars($c['resumo_consulta']); ?>">
+                                    <?php echo htmlspecialchars($c['resumo_consulta']); ?>
+                                </td>
+                                <td>
+                                    <a href="ver_imagens_consulta_pac.php?id_consulta=<?php echo $c['id_consulta']; ?>" class="btn btn-icon">
+                                        <i class="fas fa-images"></i> Imagens
+                                    </a>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                </div>
+            <?php endif; ?>
+        </main>
+    </div>
 </div>
-<hr>
-
-<div class="link-box">
-    <i class="fa-solid fa-user"></i>
-    <a href="minha_ficha.php"><strong>Ver a minha ficha</strong></a>
-</div>
-
-<div class="link-box">
-    <i class="fa-solid fa-calendar-check"></i>
-    <a href="#"><strong>Ver histórico de consulta</strong></a>
-</div>
-
-<div class="link-box">
-    <i class="fa-solid fa-comment-medical"></i>
-    <a href="#"><strong>Adicionar opinião</strong></a>
-</div>
-
-<div class="link-box">
-    <i class="fa-solid fa-right-from-bracket"></i>
-    <a href="logout.php"><strong>Terminar sessão</strong></a>
-</div>
-
-<hr>
-
-<p><em>Conteúdo específico da dashboard de Paciente aqui...</em></p>
 </body>
 </html>
