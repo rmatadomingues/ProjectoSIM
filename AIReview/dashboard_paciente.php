@@ -217,6 +217,59 @@ $dados_extra = mysqli_fetch_assoc($result_p);
             box-shadow: var(--shadow);
         }
 
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .action-card {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 20px;
+            box-shadow: var(--shadow);
+            transition: all 0.3s ease;
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .action-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+
+        .action-card h4 {
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+            color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .action-card p {
+            font-size: 0.9rem;
+            color: var(--text-color);
+            margin-bottom: 15px;
+        }
+
+        .action-card .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 8px 15px;
+            background-color: var(--primary-color);
+            color: white;
+            border-radius: var(--border-radius);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .action-card .btn:hover {
+            background-color: #3a5a8f;
+        }
+
         table {
             width: 100%;
             border-collapse: collapse;
@@ -302,6 +355,10 @@ $dados_extra = mysqli_fetch_assoc($result_p);
                 margin-bottom: 30px;
             }
 
+            .quick-actions {
+                grid-template-columns: 1fr;
+            }
+
             table {
                 display: block;
                 overflow-x: auto;
@@ -324,17 +381,6 @@ $dados_extra = mysqli_fetch_assoc($result_p);
             </div>
 
             <nav class="nav-menu">
-
-                <a href="minha_ficha_pac.php" class="nav-link">
-                    <i class="fas fa-file-medical"></i>
-                    <span>Ficha Médica</span>
-                </a>
-
-                <a href="#" class="nav-link">
-                    <i class="fas fa-comment-medical"></i>
-                    <span>Adicionar Opinião</span>
-                </a>
-
                 <a href="logout.php" class="nav-link logout-link">
                     <i class="fas fa-sign-out-alt"></i>
                     <span>Terminar Sessão</span>
@@ -344,6 +390,26 @@ $dados_extra = mysqli_fetch_assoc($result_p);
 
         <!-- Main Content -->
         <main class="main-content">
+            <h3><i class="fas fa-tachometer-alt"></i> Dashboard</h3>
+
+            <div class="quick-actions">
+                <div class="action-card">
+                    <h4><i class="fas fa-user"></i> Minha Ficha</h4>
+                    <p>Visualize e atualize seus dados pessoais e profissionais</p>
+                    <a href="minha_ficha_pac.php" class="btn">
+                        <i class="fas fa-arrow-right"></i> Acessar
+                    </a>
+                </div>
+
+                <div class="action-card">
+                    <h4><i class="fas fa-comment-medical"></i> Adicionar opinião</h4>
+                    <p>Dê uma opinião sobre a sua consulta</p>
+                    <a href="registar_consulta.php" class="btn">
+                        <i class="fas fa-plus"></i> Registrar
+                    </a>
+                </div>
+            </div>
+
             <h3><i class="fas fa-clipboard-list"></i> Histórico de Consultas</h3>
 
             <?php if (count($consultas) === 0): ?>
