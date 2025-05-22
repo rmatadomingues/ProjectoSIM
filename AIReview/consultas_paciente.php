@@ -62,10 +62,7 @@ while ($row = mysqli_fetch_assoc($resultado)) {
 }
 ?>
 
-<!DOCTYPE html>
-<html lang="pt">
 <head>
-    <meta charset="UTF-8">
     <title>Minhas Consultas</title>
 </head>
 <body>
